@@ -1,149 +1,276 @@
 ---
 name: sdd-lifecycle
 description: >-
-  Orchestrates the complete Spec-Driven Development (SDD) lifecycle for features and bugs.
-  Uses powerful models for planning/review and efficient models for implementation.
-  Ensures strict adherence to AGENTS.md, checkpoints, and TDD practices.
-  AI-agent agnostic: works with Claude, Gemini, Copilot, or any LLM-based agent.
+  Orquestra o ciclo completo de Spec-Driven Development (SDD) com rigor proporcional ao risco:
+  classifica cada mudança em tiers (0 trivial / 1 pequeno / 2 estrutural) e conduz spec → plano →
+  implementação TDD → revisão adversarial → destilação de memória. Reconhece a governança do
+  repositório (constituição AGENTS.md, steering, memória, Arquitetura Viva) quando presente e
+  degrada graciosamente quando não. Autocontida e agnóstica de agente de IA: funciona com
+  qualquer agente baseado em LLM.
 ---
 
-# SDD Lifecycle Orchestrator
+# Ciclo de Vida SDD (sdd-lifecycle)
 
-## Overview
-This skill implements the "Gold Standard" Spec-Driven Development (SDD) workflow. It orchestrates a multi-agent process to resolve bugs and implement features, ensuring that all code changes are preceded by formal specifications, test plans, isolated environments, and rigorous code reviews, strictly adhering to the repository's `AGENTS.md` (or `CLAUDE.md` / `GEMINI.md`) guidelines.
+## Visão geral
 
-**AI-agnostic**: all model references in this skill use capability descriptors ("fast/cheap model", "powerful reasoning model") rather than specific product names. Adapt them to the AI platform you are using.
+Esta skill é o **motor de execução** do Spec-Driven Development. Ela conduz a resolução de bugs
+e a implementação de features garantindo que toda mudança de código seja precedida do rigor
+proporcional ao seu risco: mudanças triviais fluem direto, mudanças estruturais passam por
+especificação formal, checkpoints humanos, TDD e revisão adversarial.
 
-## Dependencies
+Três propriedades de projeto:
 
-| Skill | Purpose |
+- **Autocontida** — cada fase traz instruções completas e critério de saída. Nenhuma outra
+  skill, plugin ou ferramenta específica é pré-requisito.
+- **Agnóstica de agente** — referências a modelos usam descritores de capacidade ("modelo
+  eficiente", "modelo de raciocínio potente"); adapte-os à sua plataforma. Nenhum artefato
+  gerado menciona marca de assistente de IA.
+- **Scaffold-aware** — se o repositório segue o modelo de governança do
+  [`sdd-scaffold`](https://github.com/thisco/sdd-scaffold) (constituição + steering + memória +
+  Arquitetura Viva), a skill usa esses artefatos; se não segue, aplica os defaults descritos aqui.
+
+## Quando usar
+
+- **Feature:** "Use a `sdd-lifecycle` para implementar a exportação multi-região."
+- **Bug:** "Use a `sdd-lifecycle` para corrigir o drift de timezone no agendador."
+- **Mudança pequena:** use também — a Fase 0 vai classificá-la como Tier 0/1 e o custo do
+  processo será proporcional.
+
+---
+
+## Fase 0 — Contexto e classificação (sempre, para qualquer mudança)
+
+1. **Constituição.** Procure o arquivo de regras do repositório, nesta ordem: `AGENTS.md`,
+   `CLAUDE.md`, `GEMINI.md`, outro arquivo de convenções apontado pelo README. Leia-o por
+   completo. Se ele tiver uma **tabela de roteamento de steering** (padrão `docs/steering/`),
+   carregue os arquivos de steering aplicáveis à tarefa — no mínimo o de processo SDD, se
+   existir. Se nada disso existir, use as convenções do README; se nem isso, pergunte ao
+   usuário quais convenções seguir.
+2. **Memória.** Se `docs/PROJECT_MEMORY.md` existir, leia antes de qualquer ação — ele carrega
+   decisões recentes e gotchas que invalidam suposições.
+3. **Pedido.** Leia o relato de bug ou o pedido de feature do usuário. Reformule-o em uma frase
+   e confirme o entendimento se houver qualquer ambiguidade.
+4. **Classificação de tier.** Use os critérios do próprio repositório se definidos (no steering
+   de processo); senão, os defaults:
+
+   | Tier | Critério objetivo | Exemplos |
+   |---|---|---|
+   | **0 — Trivial** | Nenhuma linha de código executável alterada, OU mudança sem efeito observável em runtime | docs, typo, comentário, config sem impacto de comportamento |
+   | **1 — Pequeno** | Bug fix localizado ou ajuste em até ~3 arquivos de código, sem mudança de contrato | correção de cálculo, validação faltante, ajuste de query |
+   | **2 — Feature/estrutural** | Feature nova, novo componente, mudança de contrato (API/schema), mudança de infraestrutura | endpoint novo, migração de schema, integração externa |
+
+   Anuncie o tier ao usuário com justificativa de uma linha. **Na dúvida entre dois tiers,
+   assuma o mais alto.**
+5. **Escalação obrigatória.** Se, em qualquer fase posterior, um Tier 0/1 revelar impacto
+   estrutural (contrato, schema, infra), **aborte, reclassifique como Tier 2 e reinicie na
+   matriz** — nunca continue no rigor antigo.
+
+**Critério de saída:** constituição e memória lidas; tier anunciado e justificado.
+
+## Matriz tier → fases
+
+| Tier | Caminho |
 |---|---|
-| `brainstorming` | Explore codebase and define technical approach |
-| `writing-plans` | Structure the task-by-task execution plan |
-| `using-git-worktrees` | Workspace isolation via branches or worktrees |
-| `subagent-driven-development` | Delegate coding tasks to specialized agents |
-| `test-driven-development` | Ensure test coverage before production code |
-| `verification-before-completion` | Local test suite and linter validation |
-| `requesting-code-review` | Automated senior-level code review |
-| `finishing-a-development-branch` | Standardize commits and merge strategy |
+| **0** | Fase 0 → Fase 8 (commit direto; sem spec, sem plano) |
+| **1** | Fase 0 → Fase 4 (plano leve) → 5 → 6 → 7 → 8 |
+| **2** | Fase 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 (com revisão adversarial) → 8 |
 
-## Quick Start
-
-**Feature**: "Let's use `sdd-lifecycle` to implement the new multi-region export feature."
-**Bug fix**: "Use `sdd-lifecycle` to fix the timezone drift in the scheduling daemon."
+As fases abaixo são definidas uma única vez; variações por tier estão anotadas em cada uma.
 
 ---
 
-## Workflow
+## Fase 1 — Especificação (Tier 2)
 
-### Phase 1 — Context & Brainstorming
+- Explore o código relevante antes de escrever qualquer coisa: componentes afetados, contratos
+  existentes, padrões do projeto.
+- Se o pedido for ambíguo, refine com o usuário **uma pergunta por vez** (preferindo múltipla
+  escolha), até fechar propósito, restrições e critérios de sucesso.
+- Redija a spec em `docs/specs/YYYY-MM-DD-nome-curto.md` como um **delta**: ela descreve a
+  **mudança**, não o sistema inteiro. Conteúdo mínimo:
+  - **Problema** — o que dói e por quê;
+  - **Requisitos** — numerados (R1, R2…), verificáveis;
+  - **Critérios de aceite** — checklist objetivo;
+  - **Fora de escopo** — o que deliberadamente não entra.
+- Se a spec tocar entrada externa, auth, upload ou segredos, inclua uma seção de threat-model
+  (o que um ator malicioso faria com esta superfície?).
 
-- **Action**: Look for a project conventions file (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or similar). If found, read it to internalize project rules. If none exists, proceed using the conventions from the root README or ask the user for the preferred conventions.
-- **Action**: Read the user's bug report or feature request.
-- **Action**: Invoke the `brainstorming` skill to explore the codebase and propose an architectural solution.
-- **Action**: Draft or update the formal specification document inside the `docs/specs/` directory.
+**Critério de saída:** spec redigida cobrindo problema, requisitos, aceite e fora de escopo.
 
-### Phase 2 — Architecture & Breaking Changes Check (GATEKEEPER)
+## Fase 2 — Gate arquitetural (Tier 2) — GATEKEEPER
 
-- **Action**: Scan the spec manually for destructive changes: API contract breaks, DB schema changes (column removal, type changes, index drops), or removal of public interfaces.
-- **Action**: If destructive changes are found, **block the flow**: invoke `documentation-and-adrs` to create an ADR documenting the trade-offs, and **await explicit human approval** before proceeding to Phase 3.
-- **Action**: If no breaking changes are found, proceed immediately to Phase 3.
+Duas verificações, ambas sobre a spec (antes de existir plano ou código):
 
-> **Why this gate exists**: irreversible changes (dropped columns, removed endpoints) cost disproportionately more to undo than to prevent. Catching them before planning saves re-work.
+1. **Mudanças destrutivas.** Varra a spec por: quebra de contrato de API, mudança de schema
+   (remoção de coluna, mudança de tipo, drop de índice), remoção de interface pública. Se
+   encontrar, **bloqueie o fluxo**: registre uma ADR (formato Nygard: contexto → decisão →
+   consequências) em `docs/adr/` e **aguarde aprovação humana explícita** antes da Fase 3.
+2. **Impacto Arquitetural (Arquitetura Viva).** Se o repositório mantém infraestrutura como
+   código e/ou manifesto de arquitetura (padrão scaffold: `infra/local/docker-compose.yml`,
+   `infra/cloud/`, `Arquitetura/mapa.yml` + diagrama), responda explicitamente:
+   - o compose local será alterado?
+   - algum módulo de IaC será criado ou alterado?
+   - o diagrama e o manifesto de correspondência precisarão de atualização?
 
-### Phase 3 — Human Spec Review (CHECKPOINT)
+   Qualquer "sim" obriga os artefatos a serem atualizados **na mesma branch/PR** da mudança, e
+   o verificador de drift (ex.: `scripts/verificar_drift_arquitetura.py`) a ser executado antes
+   do PR. Repos sem esses artefatos: registre "N/A" e siga.
 
-- **Action**: Present the generated specification to the user.
-- **Action**: **PAUSE EXECUTION.** Explicitly ask the user: *"Do you approve this specification, or are there any business/technical rules we should adjust before planning?"*
-- *Do not proceed to Phase 4 until the user explicitly approves.*
+> **Por que este gate existe:** mudanças irreversíveis (coluna removida, endpoint extinto)
+> custam desproporcionalmente mais para desfazer do que para prevenir — e documentação de
+> arquitetura que não acompanha a mudança na mesma PR vira ficção em semanas.
 
-### Phase 4 — Writing Plans
+**Critério de saída:** nenhuma mudança destrutiva sem ADR aprovada; checklist de impacto
+arquitetural respondido.
 
-- **Action**: Once the spec is approved, invoke the `writing-plans` skill (or `planning-and-task-breakdown` if available).
-- **Action**: Generate a detailed implementation plan in `docs/plans/YYYY-MM-DD-nome-curto.md`. The plan must include:
-  - Exact file paths and function/method signatures to be created or modified.
-  - Test coverage requirements per task.
-  - Markdown checkboxes (`- [ ]`) for each task, enabling progress tracking across sessions.
+## Fase 3 — Checkpoint humano da spec (Tier 2)
 
-### Phase 5 — Workspace Isolation
+- Apresente a spec ao usuário.
+- **PAUSE A EXECUÇÃO.** Pergunte explicitamente: *"Você aprova esta especificação, ou há
+  regras de negócio/técnicas a ajustar antes do plano?"*
+- Não prossiga para a Fase 4 sem aprovação explícita.
 
-- **Action**: Invoke `using-git-worktrees` or use native git commands to create an isolated branch:
-  - Features: `feat/YYYY-MM-DD-nome-curto`
-  - Bug fixes: `fix/YYYY-MM-DD-nome-curto`
-- **Action**: Confirm the branch was created and is clean before delegating to the implementation subagent.
+**Critério de saída:** aprovação humana registrada.
 
-### Phase 6 — Subagent-Driven Implementation (TDD Focus)
+## Fase 4 — Plano (Tier 1 e 2)
 
-- **Action**: Invoke a subagent using `subagent-driven-development`. Use a **fast, efficient model** on your AI platform (optimized for speed and cost, not maximum reasoning power) for the implementation subagent.
-- **Action**: The subagent **must** invoke the `test-driven-development` skill and write failing tests *before* modifying production code.
-  - **If the project has no test suite configured**: surface this to the user before starting. Propose a minimal test setup or document the exception explicitly — do not silently skip tests.
-- **Action**: The subagent must run the project's test suite (e.g., `pytest`, `jest`, `go test`, `cargo test`, `mvn test`) and linters after each task and mark the corresponding checkbox in the plan.
-- **Action**: Instruct the subagent to update `CHANGELOG.md` upon completion.
-- **Action**: **STRICT FALLBACK** — if the subagent hits a structural technical blocker where the spec proves unviable, it is **forbidden** from improvising workarounds. It must:
-  1. Abort execution immediately.
-  2. Return control to the orchestrator with a clear description of the blocker.
-  3. The orchestrator then triggers a **Return to Phase 1, Step 4** (update the spec document) and re-triggers the Phase 3 checkpoint.
+Plano em `docs/plans/YYYY-MM-DD-nome-curto.md`.
 
-### Phase 7 — Verification & Code Review
+**Tier 1 — plano leve:** contexto em 2–3 frases, lista de arquivos a tocar, e o **teste que
+prova o fix** (nome e o que ele verifica). Uma página no máximo.
 
-- **Action**: Invoke `verification-before-completion` to run the full project test suite and linters locally. Do not claim success until all checks pass.
-- **Action**: Invoke `requesting-code-review` to spawn a **"Code Reviewer" subagent** using a **powerful reasoning model** (highest capability available on your AI platform). The reviewer must check the diff against:
-  - The original implementation plan (`docs/plans/`).
-  - The project conventions file (`AGENTS.md` / `CLAUDE.md` / etc.).
-- **Action**: Address review feedback. If critical issues are found, send them back to the implementation subagent (Phase 6). If architectural issues are found, escalate to Phase 1.
+**Tier 2 — plano completo:**
 
-### Phase 8 — Finishing & Cleanup
+- lista exata de arquivos a criar/alterar, com assinaturas de novas funções/classes;
+- plano de testes por tarefa (o que cada teste prova);
+- tarefas como checkboxes markdown (`- [ ]`) — **único** mecanismo de rastreamento de
+  progresso; nenhum arquivo ou sistema paralelo;
+- checkpoints humanos explícitos entre fases de planos multi-fase;
+- a atualização do `CHANGELOG.md` como tarefa do plano.
 
-- **Action**: When all checks and reviews pass, invoke `finishing-a-development-branch`.
-- **Action**: Ensure commit messages follow the Conventional Commits specification (e.g., `feat(module): description`, `fix(scope): description`).
-- **Action**: Decide on integration strategy:
-  - **Create a PR** if working on a shared/team repository, if branch policy requires review, or if CI must pass before merge.
-  - **Merge directly to `main`** only for solo projects where CI has already passed locally and no remote review is required.
-- **Action**: Delete the feature branch (or worktree) after successful merge.
+**Ambos os tiers:** seção **"Impacto Arquitetural"** com as três perguntas da Fase 2
+respondidas (em Tier 1, respondidas aqui, já que a Fase 2 não roda).
+
+**Critério de saída:** plano gravado, com checkboxes e impacto arquitetural respondido.
+
+## Fase 5 — Isolamento (Tier 1 e 2)
+
+- Crie uma branch isolada e limpa a partir da `main` atualizada:
+  - features: `feat/YYYY-MM-DD-nome-curto`
+  - bugs: `fix/YYYY-MM-DD-nome-curto`
+- Se sua plataforma suporta worktrees (ou você quer preservar o diretório atual), use
+  `git worktree add`; senão, `git checkout -b` resolve.
+- Confirme que a branch está limpa antes de implementar.
+
+**Critério de saída:** branch correta, criada da `main`, working tree limpo.
+
+## Fase 6 — Implementação TDD (Tier 1 e 2)
+
+- **Delegação:** se sua plataforma suporta subagentes, delegue a implementação a um subagente
+  com um **modelo eficiente** (otimizado para custo/velocidade), passando o plano como
+  contrato. Sem subagentes, execute você mesmo — as regras não mudam.
+- **Ciclo TDD por tarefa do plano:**
+  1. **Vermelho** — escreva o teste que expressa o comportamento desejado e **rode-o para
+     vê-lo falhar** (falha pelo motivo certo, não por erro de setup);
+  2. **Verde** — escreva o mínimo de código de produção para o teste passar;
+  3. **Refatore** — melhore o desenho mantendo a suíte verde.
+  - *Sem suíte de testes configurada?* Pare e informe o usuário: proponha um setup mínimo ou
+    documente a exceção explicitamente no plano. **Nunca pule testes em silêncio.**
+- Após cada tarefa: rode a suíte do projeto e o linter (use os comandos definidos no steering
+  de qualidade do repo, se houver), e **marque o checkbox** correspondente no plano.
+- **Strict fallback (proibição de gambiarra):** se um bloqueio técnico provar que a spec ou o
+  plano são inviáveis ou inseguros, é **proibido** improvisar contornos não documentados:
+  1. aborte a implementação imediatamente;
+  2. descreva o bloqueio com precisão;
+  3. retorne à Fase 1, atualize a spec (geralmente gerando uma ADR) e repita o checkpoint da
+     Fase 3 antes de voltar a codar.
+
+**Critério de saída:** todas as tarefas do plano marcadas, suíte e linter verdes.
+
+## Fase 7 — Verificação e revisão (Tier 1 e 2)
+
+- **Prove-it:** rode a suíte completa e o linter localmente e **cole a saída no plano**
+  (seção "Evidências"). Alegação de sucesso sem evidência não encerra tarefa.
+- **Tier 1:** revise o diff você mesmo contra o plano leve — o teste prometido existe e prova
+  o fix?
+- **Tier 2 — revisão adversarial:** uma sessão ou agente **independente** (contexto novo, sem
+  o histórico da implementação), com um **modelo de raciocínio potente**, revisa a
+  implementação **contra a spec, não contra o diff**: parte de cada requisito (R1, R2…) e
+  verifica que foi de fato entregue, caçando requisitos não atendidos e desvios silenciosos.
+  O resultado é registrado no plano, em seção **"Revisão adversarial: YYYY-MM-DD — achados"**.
+- **Tratamento do feedback:** problemas críticos voltam à Fase 6; problemas arquiteturais
+  escalam à Fase 1. Feedback tecnicamente questionável se discute com evidência, não se
+  implementa cegamente.
+
+**Critério de saída:** evidências coladas no plano; achados da revisão tratados ou
+justificados por escrito.
+
+## Fase 8 — Encerramento e destilação (todos os tiers)
+
+**Tier 0:** commit convencional direto (ex.: `docs: corrigir typo na secao de auth`) e fim —
+sem spec, sem plano, sem branch dedicada, salvo regra contrária do repositório.
+
+**Tiers 1 e 2:**
+
+1. **CHANGELOG antes do merge.** Atualize `CHANGELOG.md` no formato *Keep a Changelog*:
+   versão semântica incrementada, data, título e bullets em `### Adicionado` / `### Modificado`
+   / `### Corrigido`. A entrada nasce na branch da feature — nunca depois do merge.
+2. **Commits convencionais.** `feat(escopo): …`, `fix(escopo): …`, `test(escopo): …` — em
+   linguagem profissional, sem menção a assistentes de IA.
+3. **Integração.** Abra PR quando o repositório é compartilhado, exige revisão ou tem CI de
+   merge; merge direto na `main` apenas em projeto solo com verificação local completa.
+4. **Destilação (o passo que a maioria pula):**
+   - conhecimento da spec que virou **permanente** → promova ao steering ou a uma ADR;
+   - aprendizado operacional novo (gotcha, decisão, comando) → registre em
+     `docs/PROJECT_MEMORY.md`, se o repo o mantém;
+   - a spec permanece **arquivada como histórico do delta** — ela não é fonte de verdade viva.
+5. **Limpeza.** Apague a branch (e o worktree, se usado) após o merge.
+
+**Critério de saída:** merge concluído, changelog registrado, aprendizado destilado, branch
+removida.
 
 ---
 
-## Resuming a Paused Lifecycle
+## Retomada multi-sessão
 
-Large features may span multiple sessions. To resume:
+Features grandes atravessam sessões. Para retomar:
 
-1. Read `docs/plans/YYYY-MM-DD-nome-curto.md` and identify the last checked (`- [x]`) task.
-2. Check `git log --oneline` to confirm which commits already landed.
-3. Resume from the first unchecked task in the plan, on the correct feature branch.
-4. If the spec or plan was updated since the last session, re-read `docs/specs/` before resuming.
+1. Releia a constituição e a memória do projeto (Fase 0, passos 1–2 — sempre).
+2. Abra `docs/plans/YYYY-MM-DD-nome-curto.md` e localize a última tarefa marcada (`- [x]`).
+3. Confirme com `git log --oneline` quais commits já existem na branch.
+4. Se spec ou plano mudaram desde a última sessão, releia `docs/specs/` antes de continuar.
+5. Retome da primeira tarefa desmarcada, na branch correta.
 
----
+## Erros comuns
 
-## Common Mistakes
+- **Pular a Fase 0** — implementar sem ler constituição/memória e violar regra que o projeto
+  já tinha resolvido (idioma, naming, estratégia de teste).
+- **Inflação de tier** — tratar typo como Tier 2 e afogar mudança trivial em processo. O rigor
+  desproporcional corrói a adesão ao processo tanto quanto a falta dele.
+- **Deflação de tier** — "é só um ajustinho" que muda contrato. O antídoto é o critério
+  objetivo + escalação obrigatória.
+- **Pular o checkpoint (Fase 3)** — gerar plano ou código sem aprovação explícita da spec.
+- **Rastreabilidade quebrada** — não marcar os checkboxes do plano; inviabiliza retomada
+  multi-sessão.
+- **TDD pulado em silêncio** — "não tem setup de teste" sem surfacear o gap ao usuário.
+- **Sucesso sem evidência** — declarar pronto sem colar saída de teste/lint no plano.
+- **Revisar o diff em vez da spec** — a revisão adversarial existe para pegar o requisito que
+  ninguém implementou; diff review não pega ausência.
+- **Merge sem destilação** — encerrar sem promover aprendizado a steering/ADR/memória; o
+  projeto reaprende do zero na sessão seguinte.
 
-- **Skipping the Checkpoint (Phase 3)**: Proceeding to write code or plans without explicit human approval of the `docs/specs/` document.
-- **Not reading the conventions file first**: Skipping `AGENTS.md` / `CLAUDE.md` in Phase 1 causes the subagent to violate project rules (language, naming, test strategy).
-- **Lack of Traceability**: Failing to update the checkboxes in `docs/plans/` as the subagent progresses — makes multi-session resumption impossible.
-- **Silent TDD Skip**: Letting the subagent skip tests because "there's no test setup" without surfacing the gap to the user.
-- **Silent Failures**: Letting the implementation subagent loop indefinitely on failing tests instead of escalating to the orchestrator.
-- **Wrong Branch Naming**: Not following `feat/` or `fix/` + date + short slug convention — breaks traceability in `git log`.
+## Aceleradores opcionais
 
----
+Nada abaixo é dependência. Se o seu agente dispõe de skills equivalentes, elas aceleram fases
+específicas:
 
-## Supplementary Skills Reference
-
-These skills enhance specific phases when available in your agent's plugin ecosystem. All are optional unless marked.
-
-| Phase | Skill | Purpose |
+| Fase | Capacidade | Exemplo de skill |
 |---|---|---|
-| 1 | `idea-refine` | Stress-tests initial ideas before committing to an approach |
-| 1 | `spec-driven-development` | Formally authors the PRD/Spec in `docs/specs/` |
-| 1–2 | `api-and-interface-design` | Essential when the spec defines new contracts or endpoints |
-| 4 | `planning-and-task-breakdown` | Augments `writing-plans` with incremental, testable tasks |
-| 4 | `documentation-and-adrs` | Records architectural decisions as ADRs |
-| 6 | `test-driven-development` | **(Required)** Enforces tests-before-code |
-| 6 | `incremental-implementation` | Prevents context overflow on large plans |
-| 6 | `source-driven-development` | Grounds implementation in official docs, not model memory |
-| 6 | `frontend-ui-engineering` | Frontend-specific implementation guidance |
-| 6 | `security-and-hardening` | Security review during implementation |
-| 6 | `performance-optimization` | Performance-critical path guidance |
-| 7 | `debugging-and-error-recovery` | Root-cause analysis when tests fail in CI or locally |
-| 7 | `code-review-and-quality` | Multi-axis review against plan and conventions |
-| 7 | `browser-testing-with-devtools` | Dynamic frontend validation in a real browser |
-| 8 | `shipping-and-launch` | Launch checklists and rollback planning |
-| 8 | `deprecation-and-migration` | Handles legacy code removal safely |
+| 1 | Exploração estruturada de ideias | `brainstorming`, `idea-refine` |
+| 1–2 | Desenho de contratos e interfaces | `api-and-interface-design` |
+| 4 | Quebra de trabalho em tarefas verificáveis | `writing-plans`, `planning-and-task-breakdown` |
+| 5 | Isolamento por worktree | `using-git-worktrees` |
+| 6 | Delegação a subagentes | `subagent-driven-development` |
+| 6 | Disciplina de TDD | `test-driven-development` |
+| 7 | Verificação antes de conclusão | `verification-before-completion` |
+| 7 | Revisão sênior | `requesting-code-review`, `code-review-and-quality` |
+| 8 | Encerramento de branch | `finishing-a-development-branch` |
