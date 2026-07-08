@@ -10,20 +10,20 @@
 
 ## Tarefas
 
-- [ ] **T1 — Reescrever `SKILL.md` no modelo 2.0** (R1–R7): Fase 0 + matriz de tiers, fases
+- [x] **T1 — Reescrever `SKILL.md` no modelo 2.0** (R1–R7): Fase 0 + matriz de tiers, fases
   autocontidas com critério de saída, detecção scaffold-aware com degradação graciosa, gate
   arquitetural ampliado (Arquitetura Viva), revisão adversarial contra a spec, encerramento com
   destilação, retomada multi-sessão e erros comuns atualizados, tabela de aceleradores opcionais.
   Em português.
-- [ ] **T2 — README narrativo** (R8): problema → modelo → diagrama Mermaid do ciclo → quick
+- [x] **T2 — README narrativo** (R8): problema → modelo → diagrama Mermaid do ciclo → quick
   start/instalação por agente → uso → exemplos → relação com o `sdd-scaffold` → referências →
   licença → contribuindo.
-- [ ] **T3 — Exemplos guiados** (R8): `docs/exemplos/exemplo-tier-1.md` (bug fix com plano leve
+- [x] **T3 — Exemplos guiados** (R8): `docs/exemplos/exemplo-tier-1.md` (bug fix com plano leve
   e evidência) e `docs/exemplos/exemplo-tier-2.md` (feature com spec, gate, checkpoint e revisão
   adversarial com achado). Projeto fictício.
-- [ ] **T4 — Governança do próprio repo** (R8): `AGENTS.md` mini-constituição + `CHANGELOG.md`
+- [x] **T4 — Governança do próprio repo** (R8): `AGENTS.md` mini-constituição + `CHANGELOG.md`
   com as entradas 1.0.0 e 2.0.0.
-- [ ] **T5 — Verificação e evidência**: validar o Mermaid, conferir links internos, colar
+- [x] **T5 — Verificação e evidência**: validar o Mermaid, conferir links internos, colar
   evidências neste plano e registrar a revisão adversarial contra a spec.
 - [ ] **T6 — Publicação**: merge `--no-ff` na `main`, criar `thisco/sdd-lifecycle` público no
   GitHub, push, e apontar a skill local (`~/.claude/skills/sdd-lifecycle`) para o clone.
@@ -43,6 +43,42 @@ Repositório de documentação — a "suíte" é verificação de artefato:
 
 ## Evidências
 
-_(a preencher na T5)_
+**Diagrama Mermaid** — validado com o parser oficial (`mermaid@11` + jsdom):
 
-## Revisão adversarial: _(pendente)_
+```
+$ node -e "… mermaid.parse(src) …"
+MERMAID OK — tipo: flowchart-v2
+```
+
+**Links relativos** — varredura de todos os `](caminho)` não-http em README, AGENTS, SKILL,
+exemplos, specs e planos:
+
+```
+$ for f in README.md AGENTS.md SKILL.md docs/**/*.md; do …verificar existência… done
+verificacao de links concluida   # zero links quebrados
+```
+
+## Revisão adversarial: 2026-07-08 — achados
+
+Passe requisito a requisito da spec contra os artefatos entregues:
+
+- **R1** (Fase 0 + matriz) ✅ — Fase 0 com constituição/memória/tier, matriz tier → fases,
+  "na dúvida, tier mais alto" e escalação obrigatória presentes no `SKILL.md`.
+- **R2** (scaffold-aware) ✅ — detecção em Fase 0 (steering), Fase 2 (mapa/drift, com "N/A e
+  siga" para repos sem os artefatos) e Fase 8 (memória condicional).
+- **R3** (autocontida) ✅ — toda fase tem instruções e critério de saída próprios; skills
+  externas rebaixadas a tabela de aceleradores opcionais.
+- **R4** (gate ampliado) ✅ — Fase 2 cobre destrutivas + checklist de Arquitetura Viva na
+  mesma branch/PR.
+- **R5** (prove-it + adversarial) ✅ — Fase 7; evidências e seção de registro no plano.
+- **R6** (destilação) ✅ — Fase 8, incluindo arquivamento da spec como delta.
+- **R7** (PT-BR, descritores de capacidade) ✅ — nenhuma marca de modelo/assistente no
+  `SKILL.md` ou artefatos.
+- **R8** (repo de referência) ⚠️ **ACHADO 1 (médio, corrigido):** a instrução de instalação
+  como *skill de projeto* mandava clonar o repo para dentro de `.claude/skills/`, criando um
+  repo git aninhado que o git do projeto trata como submódulo não registrado. Corrigido no
+  README: cópia do `SKILL.md` (ou submódulo explícito).
+- **Critérios de aceite** — percorridos um a um: agente sem plugin executa só com o
+  `SKILL.md` ✅; artefatos do scaffold reconhecidos nas fases correspondentes ✅; repo sem
+  scaffold percorre o ciclo com defaults ✅; Tier 0 termina em commit direto ✅; histórico git
+  registra v1 → spec/plano → v2 em commits convencionais ✅.

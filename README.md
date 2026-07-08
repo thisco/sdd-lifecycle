@@ -96,10 +96,14 @@ skill, então um clone direto no diretório de skills instala tudo.
 git clone https://github.com/thisco/sdd-lifecycle.git ~/.claude/skills/sdd-lifecycle
 ```
 
-**Claude Code (skill de projeto, versionada com o repo):**
+**Claude Code (skill de projeto, versionada com o repo):** clonar um repo git dentro do seu
+projeto criaria um repo aninhado; copie só o conteúdo, ou use submódulo se preferir rastrear
+a origem:
 
 ```bash
-git clone https://github.com/thisco/sdd-lifecycle.git .claude/skills/sdd-lifecycle
+git clone --depth 1 https://github.com/thisco/sdd-lifecycle.git /tmp/sdd-lifecycle \
+  && mkdir -p .claude/skills/sdd-lifecycle \
+  && cp /tmp/sdd-lifecycle/SKILL.md .claude/skills/sdd-lifecycle/
 ```
 
 **Gemini CLI, Copilot e outros agentes:** referencie o `SKILL.md` como instrução de contexto —
