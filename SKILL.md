@@ -199,7 +199,7 @@ respondidas (em Tier 1, respondidas aqui, já que a Fase 2 não roda).
   2. descreva o bloqueio com precisão;
   3. retorne à Fase 1, atualize a spec (geralmente gerando uma ADR), volte o `Status` dela a
      `rascunho` e repita o checkpoint da Fase 3, gravando a nova aprovação, antes de voltar a
-     codar. O mesmo vale ao reabrir a spec por escalação de tier.
+     codar. O mesmo vale ao reabrir a spec por escalação da Fase 7.
 
 **Critério de saída:** todas as tarefas do plano marcadas, suíte e linter verdes.
 
@@ -217,8 +217,8 @@ respondidas (em Tier 1, respondidas aqui, já que a Fase 2 não roda).
   com uma linha por R<n> na tabela `| R | veredito | evidência |`: veredito `atendido`,
   `parcial` ou `não atendido`; evidência em `arquivo:linha` ou saída de teste.
 - **Tratamento do feedback:** problemas críticos voltam à Fase 6; problemas arquiteturais
-  escalam à Fase 1. Feedback tecnicamente questionável se discute com evidência, não se
-  implementa cegamente.
+  escalam à Fase 1, e o `Status` da spec volta a `rascunho`. Feedback
+  tecnicamente questionável se discute com evidência, não se implementa cegamente.
 
 **Critério de saída:** evidências coladas no plano; achados da revisão tratados ou
 justificados por escrito; no Tier 2, todo R<n> da spec está na tabela de vereditos.
@@ -246,8 +246,8 @@ sem spec, sem plano, sem branch dedicada, salvo regra contrária do repositório
      verdade viva.
 5. **Limpeza.** Apague a branch (e o worktree, se usado) após o merge.
 
-**Critério de saída:** merge concluído, changelog registrado, spec arquivada, aprendizado
-destilado, branch removida.
+**Critério de saída:** merge concluído, changelog registrado, spec arquivada (Tier 2),
+aprendizado destilado, branch removida.
 
 ---
 
@@ -259,8 +259,8 @@ Features grandes atravessam sessões. Para retomar:
 2. Abra `docs/plans/YYYY-MM-DD-nome-curto.md` e localize a última tarefa marcada (`- [x]`).
 3. Confirme com `git log --oneline` quais commits já existem na branch.
 4. Se spec ou plano mudaram desde a última sessão, releia `docs/specs/` antes de continuar.
-   Confira o `Status` da spec e se há marcadores `[ESCLARECER` abertos: sem `aprovada`, volte
-   à Fase 3.
+   Confira o `Status` da spec e os marcadores: `rascunho` ou marcador `[ESCLARECER` aberto →
+   volte à Fase 3; `arquivada` → retome a Fase 8; `aprovada` → siga do plano.
 5. Retome da primeira tarefa desmarcada, na branch correta.
 
 ## Erros comuns

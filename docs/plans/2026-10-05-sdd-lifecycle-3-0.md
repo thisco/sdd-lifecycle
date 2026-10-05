@@ -173,6 +173,19 @@ $ grep -n "apresentada de novo" docs/exemplos/exemplo-tier-2.md
 # 8
 $ grep -n "ESCLARECER" SKILL.md | tail -1
 262:   Confira o `Status` da spec e se há marcadores `[ESCLARECER` abertos: sem `aprovada`, volte
+# Coerência de Status (conferência)
+$ wc -l SKILL.md
+301 SKILL.md
+# 1 retomada
+$ grep -n "retome a Fase 8" SKILL.md
+263:   volte à Fase 3; `arquivada` → retome a Fase 8; `aprovada` → siga do plano.
+# 2 escalação
+$ grep -n "escalação da Fase 7\|volta a .rascunho" SKILL.md
+202:     codar. O mesmo vale ao reabrir a spec por escalação da Fase 7.
+220:  escalam à Fase 1, e o `Status` da spec volta a `rascunho`. Feedback tecnicamente questionável se discute com evidência, não se
+# 3 critério da Fase 8
+$ grep -n "spec arquivada (Tier 2)" SKILL.md
+249:**Critério de saída:** merge concluído, changelog registrado, spec arquivada (Tier 2),
 ```
 
 Justificativa do item 6: as menções de harness ficam na seção de instalação e nas referências do
