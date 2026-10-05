@@ -71,7 +71,7 @@ exemplos ficam coerentes.
 - [x] **T8 (R10).** Acrescente `[3.0.0] — 2026-10-05 — Requisitos rastreáveis e aprovação
   registrada` no `CHANGELOG.md`, com Adicionado e Modificado, e a nota de que a mudança é major
   pela regra deste repositório.
-- [ ] **T9.** Rode o prove-it e cole a saída em Evidências:
+- [x] **T9.** Rode o prove-it e cole a saída em Evidências:
   - links relativos de `README.md` e `docs/` resolvem: um script `python3 -c` que extrai os
     `](caminho)` e testa `os.path.exists`;
   - os blocos Mermaid estão com sintaxe íntegra, conferidos por leitura;
@@ -81,6 +81,53 @@ exemplos ficam coerentes.
 - [ ] **T11.** Merge na `main` e tag `v3.0.0`, só depois do T10 e com a ordem do dono.
 
 ## Evidências
+
+```text
+$ grep -n "ESCLARECER\|Esclarecimentos\|docs/prd\|Dado" SKILL.md
+85:  existentes, padrões do projeto. Se houver PRD relacionado em `docs/prd/`, leia-o e cite-o no
+90:  `[ESCLARECER: pergunta]`. Ao receber a resposta, apague o marcador e registre a pergunta e a
+91:  resposta na seção `## Esclarecimentos`.
+96:    (`Dado/Quando/Então`) ou EARS (`QUANDO … O SISTEMA DEVE …`). Exemplo:
+98:    `- Critério: **Dado** 5 falhas seguidas, **Quando** vier a 6ª, **Então** a conta é bloqueada.`
+134:- Só apresente a spec com zero marcadores `[ESCLARECER` abertos.
+
+$ grep -n "Aprovado por" SKILL.md
+138:- Depois do "sim", grave no cabeçalho da spec `Status: aprovada`, `Aprovado por: <nome>` e
+142:**Critério de saída:** aprovação gravada no cabeçalho da spec (`Status`, `Aprovado por` e
+
+$ grep -n "(R<n>)\|cobre: R" SKILL.md
+158:  entrega, entre parênteses, `(R<n>)`; requisito sem tarefa é lacuna do plano;
+186:     nome, na docstring ou num comentário `# cobre: R<n>`; citação não prova cobertura, só liga o
+
+$ grep -n "veredito" SKILL.md
+214:  com uma linha por R<n> na tabela `| R | veredito | evidência |`: veredito `atendido`,
+221:justificados por escrito; no Tier 2, todo R<n> da spec está na tabela de vereditos.
+
+$ grep -n "arquivada" SKILL.md
+241:   - a spec permanece **arquivada como histórico do delta** — ela não é fonte de verdade viva;
+242:     mude o `Status` dela para `arquivada`.
+
+$ grep -n "verificar_pr\|scripts/" SKILL.md
+122:   o verificador de drift (ex.: `scripts/verificar_drift_arquitetura.py`) a ser executado antes
+
+$ wc -l SKILL.md  (antes: 276; limite: 316)
+     295 SKILL.md
+
+$ python3 -c ... (extrai ](caminho) de README.md, AGENTS.md, CHANGELOG.md e docs/**/*.md; os.path.exists)
+(o script ignora o literal "](caminho)", texto descritivo nos planos, não link)
+8 links relativos verificados, 0 quebrados
+
+$ mermaid: leitura do bloco do README (rótulos novos nas Fases 3, 7 e 8) e checagem de aspas/colchetes
+1 bloco(s) mermaid
+aspas/colchetes balanceados em 17 linhas
+
+$ grep de marca de assistente de IA em SKILL.md, README.md, CHANGELOG.md, docs/exemplos (esperado: vazio)
+(vazio)
+
+$ coerência dos exemplos: grep -c "R<n>\|\*\*R[0-9]\*\*\|Aprovado por\|veredito\|arquivada" docs/exemplos/exemplo-tier-2.md
+8
+(R<n> com critério, cabeçalho de aprovação, tabela de veredito, cobre: R e Status arquivada presentes; exemplo-tier-1.md sem spec, não contradiz a 3.0.0, não alterado)
+```
 
 ## Revisão adversarial: <data> — achados
 
