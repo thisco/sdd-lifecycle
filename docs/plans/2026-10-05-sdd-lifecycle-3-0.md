@@ -66,9 +66,9 @@ exemplos ficam coerentes.
   cabeçalho, a retomada não sabe que a spec foi aprovada". Confira que nenhum script do scaffold
   virou obrigatório: `grep -n 'verificar_pr\|scripts/' SKILL.md` só acha uso condicional
   ("se existir"). Confira o tamanho com `wc -l SKILL.md`, que precisa dar 316 ou menos.
-- [ ] **T7 (R10).** Atualize o README e `docs/exemplos/exemplo-tier-2.md`, e o Tier 1 só se ele
+- [x] **T7 (R10).** Atualize o README e `docs/exemplos/exemplo-tier-2.md`, e o Tier 1 só se ele
   contradisser a 3.0.0. Inclua o diagrama se ele citar aprovação ou arquivamento.
-- [ ] **T8 (R10).** Acrescente `[3.0.0] — 2026-10-05 — Requisitos rastreáveis e aprovação
+- [x] **T8 (R10).** Acrescente `[3.0.0] — 2026-10-05 — Requisitos rastreáveis e aprovação
   registrada` no `CHANGELOG.md`, com Adicionado e Modificado, e a nota de que a mudança é major
   pela regra deste repositório.
 - [ ] **T9.** Rode o prove-it e cole a saída em Evidências:
