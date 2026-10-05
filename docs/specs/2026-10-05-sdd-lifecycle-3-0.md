@@ -1,7 +1,7 @@
 # Spec: sdd-lifecycle 3.0.0, requisitos rastreáveis e aprovação registrada
 
 > **Tier:** 2 (muda critérios de saída das Fases 1, 3, 4, 6, 7 e 8; por este `AGENTS.md`, major).
-> **Status:** aprovada
+> **Status:** arquivada
 > **Aprovado por:** thiago
 > **Aprovado em:** 2026-10-05
 > **Data:** 2026-10-05
