@@ -78,7 +78,7 @@ exemplos ficam coerentes.
   - os exemplos ficam coerentes com o fluxo novo.
 - [x] **T10.** Revisão adversarial independente contra a spec, com a tabela por requisito, em
   "Revisão adversarial".
-- [ ] **T11.** Merge na `main` e tag `v3.0.0`, só depois do T10 e com a ordem do dono.
+- [x] **T11.** Merge na `main` e tag `v3.0.0`, só depois do T10 e com a ordem do dono.
 
 ## Evidências
 
