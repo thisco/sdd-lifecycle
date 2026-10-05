@@ -76,7 +76,7 @@ exemplos ficam coerentes.
     `](caminho)` e testa `os.path.exists`;
   - os blocos Mermaid estão com sintaxe íntegra, conferidos por leitura;
   - os exemplos ficam coerentes com o fluxo novo.
-- [ ] **T10.** Revisão adversarial independente contra a spec, com a tabela por requisito, em
+- [x] **T10.** Revisão adversarial independente contra a spec, com a tabela por requisito, em
   "Revisão adversarial".
 - [ ] **T11.** Merge na `main` e tag `v3.0.0`, só depois do T10 e com a ordem do dono.
 
@@ -233,3 +233,15 @@ Achados e tratamento:
 
 Veredito do revisor: não vai a merge antes de tratar os achados 1 a 4. Todos os 8 serão
 tratados.
+
+Conferência das correções (mesmo revisor independente, 2026-10-05):
+
+- **Rodada 1:** os 8 achados ficaram resolvidos (commits 0587372 e be41928), mas as correções
+  abriram 3 contradições novas:
+  - a retomada mandava uma spec `arquivada` de volta à Fase 3;
+  - a regra de `rascunho` estava na escalação de tier, e o caso certo é a escalação da Fase 7;
+  - o critério de saída da Fase 8 exigia spec também no Tier 1.
+- **Rodada 2:** as três foram resolvidas no commit a670049. R1 a R10 atendidos, sem regressão,
+  e o SKILL.md tem 301 linhas. Veredito: pode ir a merge.
+- **Ressalva baixa, tratada depois:** na retomada, uma spec em `rascunho` pularia o gate da Fase 2.
+  O texto passou a mandar retomar a Fase 1, 2 ou 3, conforme o ponto onde parou.

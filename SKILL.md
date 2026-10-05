@@ -260,7 +260,8 @@ Features grandes atravessam sessões. Para retomar:
 3. Confirme com `git log --oneline` quais commits já existem na branch.
 4. Se spec ou plano mudaram desde a última sessão, releia `docs/specs/` antes de continuar.
    Confira o `Status` da spec e os marcadores: `rascunho` ou marcador `[ESCLARECER` aberto →
-   volte à Fase 3; `arquivada` → retome a Fase 8; `aprovada` → siga do plano.
+   retome a Fase 1, 2 ou 3, conforme o ponto onde parou (o gate da Fase 2 nunca se pula);
+   `arquivada` → retome a Fase 8; `aprovada` → siga do plano.
 5. Retome da primeira tarefa desmarcada, na branch correta.
 
 ## Erros comuns
