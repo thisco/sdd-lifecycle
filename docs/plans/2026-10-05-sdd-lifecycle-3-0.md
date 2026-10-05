@@ -32,7 +32,7 @@ exemplos ficam coerentes.
 
 ## Tarefas
 
-- [ ] **T1 (R1, R2, R3).** Na Fase 1 do `SKILL.md`, acrescente:
+- [x] **T1 (R1, R2, R3).** Na Fase 1 do `SKILL.md`, acrescente:
   - requisitos em linhas `**R<n>** …`, cada um com ao menos um critério GWT
     (`Dado/Quando/Então`) ou EARS (`QUANDO … O SISTEMA DEVE …`), com um exemplo de 3 linhas;
   - o marcador `[ESCLARECER: …]`, a seção `## Esclarecimentos` e a regra de apagar o marcador ao
@@ -42,7 +42,7 @@ exemplos ficam coerentes.
   Na lista de conteúdo mínimo, troque "Requisitos — numerados (R1, R2…), verificáveis" pela forma
   com critério. Conferência: `grep -n 'ESCLARECER\|Esclarecimentos\|docs/prd\|Dado' SKILL.md`
   acha as quatro coisas na Fase 1.
-- [ ] **T2 (R4).** Na Fase 3, acrescente:
+- [x] **T2 (R4).** Na Fase 3, acrescente:
   - "só apresente a spec com zero marcadores `[ESCLARECER` abertos";
   - depois do "sim", gravar `Status: aprovada`, `Aprovado por: <nome>` e
     `Aprovado em: AAAA-MM-DD` no cabeçalho da spec, num commit próprio
@@ -52,17 +52,17 @@ exemplos ficam coerentes.
   aprovação escrita pelo próprio agente sem pedido não vale. Critério de saída: "aprovação gravada
   no cabeçalho da spec". Conferência: `grep -n 'Aprovado por' SKILL.md` acha a linha na Fase 3 e
   no critério de saída.
-- [ ] **T3 (R5, R6).** Na Fase 4 (Tier 2), cada tarefa termina com os R<n> que entrega, entre
+- [x] **T3 (R5, R6).** Na Fase 4 (Tier 2), cada tarefa termina com os R<n> que entrega, entre
   parênteses, e um R<n> sem tarefa é lacuna do plano. Na Fase 6, o teste vermelho cita o R<n> no
   nome, na docstring ou num comentário `# cobre: R<n>`; acrescente que citação não prova
   cobertura. Conferência: `grep -n '(R<n>)\|cobre: R' SKILL.md`.
-- [ ] **T4 (R7).** Na Fase 7 (Tier 2), a revisão adversarial registra a tabela
+- [x] **T4 (R7).** Na Fase 7 (Tier 2), a revisão adversarial registra a tabela
   `| R | veredito | evidência |`, com o veredito atendido, parcial ou não atendido e a evidência
   em arquivo:linha ou saída de teste. Critério de saída: todo R<n> da spec está na tabela.
   Conferência: `grep -n 'veredito' SKILL.md`.
-- [ ] **T5 (R8).** Na Fase 8, passo 4 (Destilação), mude o `Status` da spec para `arquivada`.
+- [x] **T5 (R8).** Na Fase 8, passo 4 (Destilação), mude o `Status` da spec para `arquivada`.
   Conferência: `grep -n 'arquivada' SKILL.md` acha a linha na Fase 8.
-- [ ] **T6 (R9).** Em "Erros comuns", acrescente "aprovar só na conversa: sem registro no
+- [x] **T6 (R9).** Em "Erros comuns", acrescente "aprovar só na conversa: sem registro no
   cabeçalho, a retomada não sabe que a spec foi aprovada". Confira que nenhum script do scaffold
   virou obrigatório: `grep -n 'verificar_pr\|scripts/' SKILL.md` só acha uso condicional
   ("se existir"). Confira o tamanho com `wc -l SKILL.md`, que precisa dar 316 ou menos.
