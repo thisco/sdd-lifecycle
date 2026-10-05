@@ -122,7 +122,7 @@ $ mermaid: leitura do bloco do README (rótulos novos nas Fases 3, 7 e 8) e chec
 aspas/colchetes balanceados em 17 linhas
 
 $ grep de marca de assistente de IA em SKILL.md, README.md, CHANGELOG.md, docs/exemplos (esperado: vazio)
-(vazio)
+(saída real e justificativa em "Correções da revisão", item 6; a saída inicial vazia estava errada)
 
 $ coerência dos exemplos: grep -c "R<n>\|\*\*R[0-9]\*\*\|Aprovado por\|veredito\|arquivada" docs/exemplos/exemplo-tier-2.md
 8
