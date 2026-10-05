@@ -129,7 +129,43 @@ $ coerência dos exemplos: grep -c "R<n>\|\*\*R[0-9]\*\*\|Aprovado por\|veredito
 (R<n> com critério, cabeçalho de aprovação, tabela de veredito, cobre: R e Status arquivada presentes; exemplo-tier-1.md sem spec, não contradiz a 3.0.0, não alterado)
 ```
 
-## Revisão adversarial: <data> — achados
+## Revisão adversarial: 2026-10-05 — achados
+
+Revisor independente, sessão nova, modelo de raciocínio potente, contra a spec.
 
 | R | veredito | evidência |
 |---|---|---|
+| R1 | atendido | SKILL.md:95-98 |
+| R2 | atendido | SKILL.md:89-91 |
+| R3 | atendido | SKILL.md:84-86 |
+| R4 | atendido | SKILL.md:134-143 |
+| R5 | atendido | SKILL.md:156-158 |
+| R6 | atendido | SKILL.md:185-187 |
+| R7 | atendido | SKILL.md:213-215, 221 |
+| R8 | atendido | SKILL.md:241-242 |
+| R9 | atendido | SKILL.md:23-24, 122 (script só como "ex.:", condicional) |
+| R10 | parcial | README.md:87 (Mermaid conferido só por leitura); tag pendente, esperado |
+
+Achados e tratamento:
+
+1. Médio. O rótulo Mermaid `veredito por R<n>`, em README.md:87, perde o `<n>` no sanitizador.
+   Tratamento: trocar por texto sem `<>`.
+2. Médio. Quando a escalação ou o strict fallback voltam à Fase 1, o cabeçalho fica com
+   `Status: aprovada` obsoleto (SKILL.md:194-199, 216-217). Tratamento: ao reabrir a spec, o
+   `Status` volta a rascunho, e a nova aprovação é gravada na Fase 3.
+3. Médio. A spec só é arquivada depois do merge (SKILL.md:235-246), e o critério de saída da Fase
+   8 não cita o arquivamento. Tratamento: arquivar antes do merge, junto do CHANGELOG, e citar
+   isso no critério de saída.
+4. Médio. CHANGELOG.md:28 afirma que o critério de saída da Fase 1 mudou, e ele não mudou.
+   Tratamento: incluir "requisitos R<n> com critério" no critério de saída da Fase 1.
+5. Baixo. Checklist de aceite e critério por R<n> convivem de forma ambígua (SKILL.md:99).
+   Tratamento: o checklist é opcional e complementa.
+6. Baixo. A evidência de "marca de IA" registra vazio, mas o README cita harnesses na seção de
+   instalação, menções que já existiam. Tratamento: registrar a saída real e a exceção.
+7. Baixo. No exemplo Tier 2, a aprovação com ressalva é gravada sem nova apresentação
+   (exemplo-tier-2.md:80-82). Tratamento: mostrar a reapresentação.
+8. Baixo. A retomada multi-sessão não confere `Status` nem marcadores abertos (SKILL.md:252-258).
+   Tratamento: acrescentar o passo.
+
+Veredito do revisor: não vai a merge antes de tratar os achados 1 a 4. Todos os 8 serão
+tratados.
