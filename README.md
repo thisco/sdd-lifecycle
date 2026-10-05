@@ -84,7 +84,7 @@ flowchart TD
     F4L --> F5
     F5 --> F6["Fase 6 — Implementação TDD"]
     F6 -- "bloqueio estrutural<br/>(strict fallback)" --> F1
-    F6 --> F7["Fase 7 — Verificação<br/>evidência no plano · Tier 2: revisão adversarial, veredito por R<n>"]
+    F6 --> F7["Fase 7 — Verificação<br/>evidência no plano · Tier 2: revisão adversarial, veredito por requisito"]
     F7 -- "achado crítico" --> F6
     F7 --> F8["Fase 8 — Encerramento e destilação<br/>CHANGELOG · merge · memória · spec arquivada"]
 ```

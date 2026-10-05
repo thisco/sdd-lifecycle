@@ -96,12 +96,14 @@ As fases abaixo são definidas uma única vez; variações por tier estão anota
     (`Dado/Quando/Então`) ou EARS (`QUANDO … O SISTEMA DEVE …`). Exemplo:
     `**R1** O login bloqueia a conta após 5 falhas.`
     `- Critério: **Dado** 5 falhas seguidas, **Quando** vier a 6ª, **Então** a conta é bloqueada.`
-  - **Critérios de aceite** — checklist objetivo;
+  - **Critérios de aceite** — checklist objetivo, opcional: complementa os critérios de cada
+    R<n>, não os substitui;
   - **Fora de escopo** — o que deliberadamente não entra.
 - Se a spec tocar entrada externa, auth, upload ou segredos, inclua uma seção de threat-model
   (o que um ator malicioso faria com esta superfície?).
 
-**Critério de saída:** spec redigida cobrindo problema, requisitos, aceite e fora de escopo.
+**Critério de saída:** spec redigida cobrindo problema, requisitos R<n> com critério, aceite e
+fora de escopo.
 
 ## Fase 2 — Gate arquitetural (Tier 2) — GATEKEEPER
 
@@ -195,8 +197,9 @@ respondidas (em Tier 1, respondidas aqui, já que a Fase 2 não roda).
   plano são inviáveis ou inseguros, é **proibido** improvisar contornos não documentados:
   1. aborte a implementação imediatamente;
   2. descreva o bloqueio com precisão;
-  3. retorne à Fase 1, atualize a spec (geralmente gerando uma ADR) e repita o checkpoint da
-     Fase 3 antes de voltar a codar.
+  3. retorne à Fase 1, atualize a spec (geralmente gerando uma ADR), volte o `Status` dela a
+     `rascunho` e repita o checkpoint da Fase 3, gravando a nova aprovação, antes de voltar a
+     codar. O mesmo vale ao reabrir a spec por escalação de tier.
 
 **Critério de saída:** todas as tarefas do plano marcadas, suíte e linter verdes.
 
@@ -227,7 +230,8 @@ sem spec, sem plano, sem branch dedicada, salvo regra contrária do repositório
 
 **Tiers 1 e 2:**
 
-1. **CHANGELOG antes do merge.** Atualize `CHANGELOG.md` no formato *Keep a Changelog*:
+1. **CHANGELOG e spec antes do merge.** No Tier 2, mude o `Status` da spec para `arquivada`
+   junto do changelog. Atualize `CHANGELOG.md` no formato *Keep a Changelog*:
    versão semântica incrementada, data, título e bullets em `### Adicionado` / `### Modificado`
    / `### Corrigido`. A entrada nasce na branch da feature — nunca depois do merge.
 2. **Commits convencionais.** `feat(escopo): …`, `fix(escopo): …`, `test(escopo): …` — em
@@ -238,12 +242,12 @@ sem spec, sem plano, sem branch dedicada, salvo regra contrária do repositório
    - conhecimento da spec que virou **permanente** → promova ao steering ou a uma ADR;
    - aprendizado operacional novo (gotcha, decisão, comando) → registre em
      `docs/PROJECT_MEMORY.md`, se o repo o mantém;
-   - a spec permanece **arquivada como histórico do delta** — ela não é fonte de verdade viva;
-     mude o `Status` dela para `arquivada`.
+   - a spec permanece **arquivada como histórico do delta** (passo 1) — ela não é fonte de
+     verdade viva.
 5. **Limpeza.** Apague a branch (e o worktree, se usado) após o merge.
 
-**Critério de saída:** merge concluído, changelog registrado, aprendizado destilado, branch
-removida.
+**Critério de saída:** merge concluído, changelog registrado, spec arquivada, aprendizado
+destilado, branch removida.
 
 ---
 
@@ -255,6 +259,8 @@ Features grandes atravessam sessões. Para retomar:
 2. Abra `docs/plans/YYYY-MM-DD-nome-curto.md` e localize a última tarefa marcada (`- [x]`).
 3. Confirme com `git log --oneline` quais commits já existem na branch.
 4. Se spec ou plano mudaram desde a última sessão, releia `docs/specs/` antes de continuar.
+   Confira o `Status` da spec e se há marcadores `[ESCLARECER` abertos: sem `aprovada`, volte
+   à Fase 3.
 5. Retome da primeira tarefa desmarcada, na branch correta.
 
 ## Erros comuns

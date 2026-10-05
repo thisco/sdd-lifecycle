@@ -129,6 +129,57 @@ $ coerência dos exemplos: grep -c "R<n>\|\*\*R[0-9]\*\*\|Aprovado por\|veredito
 (R<n> com critério, cabeçalho de aprovação, tabela de veredito, cobre: R e Status arquivada presentes; exemplo-tier-1.md sem spec, não contradiz a 3.0.0, não alterado)
 ```
 
+### Correções da revisão
+
+```text
+$ wc -l SKILL.md  (limite: 316)
+301 SKILL.md
+
+# 1
+$ grep -n "veredito por" README.md
+57:veredito por requisito (`| R | veredito | evidência |`). Cada requisito `R<n>` tem critério de
+87:    F6 --> F7["Fase 7 — Verificação<br/>evidência no plano · Tier 2: revisão adversarial, veredito por requisito"]
+# 2
+$ grep -n "rascunho" SKILL.md
+201:     `rascunho` e repita o checkpoint da Fase 3, gravando a nova aprovação, antes de voltar a
+# 3
+$ grep -n "arquivada" SKILL.md
+233:1. **CHANGELOG e spec antes do merge.** No Tier 2, mude o `Status` da spec para `arquivada`
+245:   - a spec permanece **arquivada como histórico do delta** (passo 1) — ela não é fonte de
+249:**Critério de saída:** merge concluído, changelog registrado, spec arquivada, aprendizado
+# 4
+$ grep -n "requisitos R<n> com critério" SKILL.md
+105:**Critério de saída:** spec redigida cobrindo problema, requisitos R<n> com critério, aceite e
+# 5
+$ grep -n "opcional" SKILL.md
+99:  - **Critérios de aceite** — checklist objetivo, opcional: complementa os critérios de cada
+# 6 (busca de marca, saída real)
+$ grep -rniE 'claude|anthropic|gpt|openai|gemini|copilot' SKILL.md README.md CHANGELOG.md docs/exemplos
+SKILL.md:44:   `CLAUDE.md`, `GEMINI.md`, outro arquivo de convenções apontado pelo README. Leia-o por
+README.md:97:**Claude Code (skill pessoal):**
+README.md:100:git clone https://github.com/thisco/sdd-lifecycle.git ~/.claude/skills/sdd-lifecycle
+README.md:103:**Claude Code (skill de projeto, versionada com o repo):** clonar um repo git dentro do seu
+README.md:109:  && mkdir -p .claude/skills/sdd-lifecycle \
+README.md:110:  && cp /tmp/sdd-lifecycle/SKILL.md .claude/skills/sdd-lifecycle/
+README.md:113:**Gemini CLI, Copilot e outros agentes:** referencie o `SKILL.md` como instrução de contexto —
+README.md:114:por exemplo, importando-o no arquivo de instruções do agente (`GEMINI.md`,
+README.md:115:`.github/copilot-instructions.md`) ou colando o caminho no prompt:
+README.md:120:Para atualizar: `git -C ~/.claude/skills/sdd-lifecycle pull`.
+README.md:185:- [Anthropic Engineering — Claude Code best practices](https://www.anthropic.com/engineering/claude-code-best-practices) — práticas de engenharia com agentes.
+README.md:186:- [Anthropic Engineering — Context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — engenharia de contexto para agentes.
+# 7
+$ grep -n "apresentada de novo" docs/exemplos/exemplo-tier-2.md
+82:requisito, então a spec é ajustada (R4 reescrito) e **apresentada de novo**, com o mesmo
+# 8
+$ grep -n "ESCLARECER" SKILL.md | tail -1
+262:   Confira o `Status` da spec e se há marcadores `[ESCLARECER` abertos: sem `aprovada`, volte
+```
+
+Justificativa do item 6: as menções de harness ficam na seção de instalação e nas referências do
+README, e SKILL.md:44 cita nomes de arquivos de convenção (`CLAUDE.md`, `GEMINI.md`). Todas
+são pré-existentes na `main` e necessárias para dizer onde instalar a skill e qual arquivo de
+regras procurar; nenhuma é marca de assistente em artefato gerado.
+
 ## Revisão adversarial: 2026-10-05 — achados
 
 Revisor independente, sessão nova, modelo de raciocínio potente, contra a spec.

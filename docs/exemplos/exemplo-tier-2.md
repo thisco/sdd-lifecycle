@@ -78,9 +78,10 @@ O time de facilities consolida ocupação manualmente, copiando dados da UI.
 > "Você aprova esta especificação, ou há regras de negócio/técnicas a ajustar antes do plano?"
 
 A spec só foi apresentada com zero marcadores `[ESCLARECER` abertos. O usuário responde:
-*"Aprovo, mas o limite é 92 dias corridos incluindo as duas pontas."* A spec é ajustada (R4
-reescrito) e, depois do "sim", o cabeçalho é gravado num commit próprio
-(`docs(specs): aprovar exportacao-csv-reservas`):
+*"Aprovo, mas o limite é 92 dias corridos incluindo as duas pontas."* A ressalva muda um
+requisito, então a spec é ajustada (R4 reescrito) e **apresentada de novo**, com o mesmo
+pedido de aprovação. Só depois do "sim" à versão ajustada o cabeçalho é gravado num commit
+próprio (`docs(specs): aprovar exportacao-csv-reservas`):
 
 ```markdown
 > **Status:** aprovada
@@ -130,7 +131,8 @@ e a revisão é re-executada: limpa, com R2 em `atendido` e todos os R<n> na tab
 
 ## Fase 8 — Encerramento e destilação
 
-1. `CHANGELOG.md` (1.5.0 — Adicionado) na branch, antes do merge.
+1. `CHANGELOG.md` (1.5.0 — Adicionado) na branch, antes do merge, e a spec muda para
+   `Status: arquivada` no mesmo commit.
 2. PR com testes verdes; merge; branch apagada.
 3. **Destilação:**
    - A regra "toda exportação de CSV sanitiza fórmulas em todos os prefixos perigosos" é
@@ -138,7 +140,7 @@ e a revisão é re-executada: limpa, com R2 em `atendido` e todos os R<n> na tab
      spec para virar norma permanente.
    - `PROJECT_MEMORY.md` ganha: *"testes de fuso devem usar fuso ≠ UTC — bug de R2 passou
      porque o teste usava UTC"*.
-   - A spec é arquivada como histórico do delta, com `Status: arquivada`.
+   - A spec fica como histórico do delta, já arquivada no passo 1.
 
 **O que este exemplo demonstra:** os dois checkpoints humanos aconteceram onde errar era caro
 (spec e limite de negócio), a revisão adversarial pegou um requisito silenciosamente não
