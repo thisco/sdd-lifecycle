@@ -5,6 +5,29 @@ Todas as mudanças notáveis deste projeto são documentadas neste arquivo, no f
 [versionamento semântico](https://semver.org/lang/pt-BR/): mudanças no fluxo da skill são
 versões *major*, exemplos e documentação são *minor*, correções são *patch*.
 
+## [3.0.0] — 2026-10-05 — Requisitos rastreáveis e aprovação registrada
+
+Major pela regra deste repositório: a mudança altera critérios de saída de fases do fluxo.
+
+### Adicionado
+
+- **Requisitos rastreáveis (Fase 1)**: linhas `**R<n>** …`, cada uma com ao menos um critério
+  de aceite em GWT ou EARS, e leitura do PRD relacionado em `docs/prd/` quando houver.
+- **Marcador `[ESCLARECER: …]`** para dúvidas sem resposta e seção `## Esclarecimentos` para o
+  registro de pergunta e resposta.
+- **Aprovação gravada (Fase 3)**: `Status: aprovada`, `Aprovado por` e `Aprovado em` no
+  cabeçalho da spec, em commit próprio, e spec apresentada só com zero marcadores abertos.
+- **Rastreio por requisito**: tarefas do plano terminam com `(R<n>)` (Fase 4), o teste vermelho
+  cita o R<n> (Fase 6) e a revisão adversarial registra a tabela `| R | veredito | evidência |`
+  (Fase 7).
+- Erro comum "aprovar só na conversa".
+
+### Modificado
+
+- **Fase 8**: a spec passa a `Status: arquivada` no encerramento.
+- Critérios de saída das Fases 1, 3 e 7 atualizados.
+- README, diagrama Mermaid e exemplo de Tier 2 coerentes com o novo fluxo.
+
 ## [2.0.0] — 2026-07-08 — Rigor proporcional por tiers (SDD 2.0)
 
 ### Adicionado

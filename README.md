@@ -48,16 +48,20 @@ estrutural.
 
 **2. Portões humanos onde errar é caro.** Mudanças destrutivas (contrato de API, schema,
 interface pública) bloqueiam o fluxo até existir uma ADR aprovada por humano. A spec inteira
-passa por checkpoint humano antes de virar plano. O resto flui sem fricção.
+passa por checkpoint humano antes de virar plano, e a aprovação fica gravada no cabeçalho da
+spec (`Status`, `Aprovado por`, `Aprovado em`). O resto flui sem fricção.
 
 **3. Prove-it e revisão adversarial.** Nenhuma tarefa fecha sem evidência colada no plano
 (saída de testes e lint). Em Tier 2, um agente **independente** revisa a implementação **contra
-a spec, não contra o diff** — partindo de cada requisito e verificando que foi entregue. Diff
-review não enxerga ausência; revisão adversarial sim.
+a spec, não contra o diff** — partindo de cada requisito e verificando que foi entregue, com um
+veredito por requisito (`| R | veredito | evidência |`). Cada requisito `R<n>` tem critério de
+aceite, tarefa no plano e teste que o cita. Diff review não enxerga ausência; revisão
+adversarial sim.
 
 **4. Destilação de memória.** O merge não encerra o ciclo: conhecimento que virou permanente é
 promovido ao steering ou a uma ADR, aprendizados operacionais vão para a memória do projeto, e
-a spec é arquivada como histórico do delta. O projeto lembra o que aprendeu.
+a spec é arquivada (`Status: arquivada`) como histórico do delta. O projeto lembra o que
+aprendeu.
 
 E tudo isso **autocontido e agnóstico**: cada fase traz instruções completas e critério de
 saída; nenhuma skill externa, plugin ou modelo específico é pré-requisito. Modelos são
@@ -74,15 +78,15 @@ flowchart TD
     F1 --> F2["Fase 2 — Gate arquitetural<br/>breaking changes · Arquitetura Viva"]
     F2 -- "mudança destrutiva" --> ADR["ADR + aprovação humana"]
     ADR --> F3
-    F2 -- "sem destrutiva" --> F3["Fase 3 — Checkpoint humano da spec"]
+    F2 -- "sem destrutiva" --> F3["Fase 3 — Checkpoint humano da spec<br/>aprovação gravada no cabeçalho"]
     F3 --> F4["Fase 4 — Plano completo"]
     F4 --> F5["Fase 5 — Branch isolada"]
     F4L --> F5
     F5 --> F6["Fase 6 — Implementação TDD"]
     F6 -- "bloqueio estrutural<br/>(strict fallback)" --> F1
-    F6 --> F7["Fase 7 — Verificação<br/>evidência no plano · Tier 2: revisão adversarial contra a spec"]
+    F6 --> F7["Fase 7 — Verificação<br/>evidência no plano · Tier 2: revisão adversarial, veredito por requisito"]
     F7 -- "achado crítico" --> F6
-    F7 --> F8["Fase 8 — Encerramento e destilação<br/>CHANGELOG · merge · memória"]
+    F7 --> F8["Fase 8 — Encerramento e destilação<br/>CHANGELOG · merge · memória · spec arquivada"]
 ```
 
 ## Instalação
@@ -134,8 +138,9 @@ Dois walkthroughs completos, com todos os artefatos que a skill produz num proje
 - [`docs/exemplos/exemplo-tier-1.md`](docs/exemplos/exemplo-tier-1.md) — bug fix Tier 1:
   classificação, plano leve, ciclo TDD, evidência e encerramento.
 - [`docs/exemplos/exemplo-tier-2.md`](docs/exemplos/exemplo-tier-2.md) — feature Tier 2:
-  spec como delta, gate arquitetural, checkpoint humano, plano completo, revisão adversarial
-  (com um achado real de requisito esquecido) e destilação.
+  spec como delta com requisitos `R<n>` e critérios, gate arquitetural, checkpoint humano com
+  aprovação gravada, plano completo, revisão adversarial com tabela de vereditos (e um achado
+  real de requisito esquecido) e destilação.
 
 ## Relação com o sdd-scaffold
 
