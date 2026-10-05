@@ -1,9 +1,9 @@
 # Spec: sdd-lifecycle 3.0.0, requisitos rastreáveis e aprovação registrada
 
 > **Tier:** 2 (muda critérios de saída das Fases 1, 3, 4, 6, 7 e 8; por este `AGENTS.md`, major).
-> **Status:** em revisão
-> **Aprovado por:**
-> **Aprovado em:**
+> **Status:** aprovada
+> **Aprovado por:** thiago
+> **Aprovado em:** 2026-10-05
 > **Data:** 2026-10-05
 > **Companheira:** spec do sdd-scaffold 1.7.0 (`docs/specs/2026-10-05-spec-verificavel-e-aprovada.md`
 > naquele repositório). Origem: análise da prática SDD da curadoria A.5, §7 "Release 1".
